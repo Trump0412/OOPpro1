@@ -106,15 +106,18 @@ double stu::getcourse7()
 
 double stu::gettest()
 {
-    if(test>=0&&test<=100)return test;
-    else return 0;
+    if(test0.toDouble()>=0&&test0.toDouble()<=100)  test=  test0.toDouble();
+    else test= 0;
+    return test;
 }
 
 double stu::getfinal()
 {
-final=getcourse1()+getcourse2()+getcourse3()+getcourse4()+getcourse5()
+    final=getcourse1()+getcourse2()+getcourse3()+getcourse4()+getcourse5()
             +getcourse6()+getcourse7()
-            +gettest();
+            +0.5*gettest();
     return final;
 
 }
+
+

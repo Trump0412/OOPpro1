@@ -21,9 +21,10 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    setWindowTitle(tr("学生成绩管理系统"));
     //1.根据数据类型链接数据库
     db= QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName("oop02.db");
+    db.setDatabaseName("oop04.db");
     //2.打开
     if(!db.open())
     {
@@ -113,6 +114,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->widget_find1->close();
     ui->widget_de->close();
      ui->widget_find2->close();
+      ui->widget_gaojichazhao->close();
 
 }
 
@@ -124,7 +126,7 @@ MainWindow::~MainWindow()
 void MainWindow::refresh()
 {
     //2. run sql
-    model->setQuery("select * from stu");//结果集
+    model->setQuery("select id,name,course1,course2,course3,course4,course5,course6,course7,test0,sum from stu");//结果集
     //根据需求设置表头
     model->setHeaderData(0,Qt::Horizontal,"ID");
     model->setHeaderData(1,Qt::Horizontal,"Name");
@@ -146,8 +148,10 @@ void MainWindow::refresh()
 
     //将view显示
     view->show();
-
+     ui->widget_gaojichazhao->close();
 }
+
+
 
 
 
@@ -369,7 +373,7 @@ void MainWindow::on_find_id_clicked()
 
     QString id=ui->lineEdit->text();
 
-    QString did=QString("select * from stu where id=%1").arg(id);
+    QString did=QString("select id,name,course1,course2,course3,course4,course5,course6,course7,test0,sum from stu where id=%1").arg(id);
     model->setQuery(did);//结果集
     //根据需求设置表头
     model->setHeaderData(0,Qt::Horizontal,"ID");
@@ -393,6 +397,7 @@ void MainWindow::on_find_id_clicked()
     //将view显示
     view->show();
      ui->widget_main->show();
+     ui->widget_gaojichazhao->close();
 
     if(delete_ok)ui->widget_de->show();
 }
@@ -404,7 +409,7 @@ void MainWindow::on_find_name_clicked()
 
     QString name=ui->lineEdit_2->text();
 
-    QString dname=QString("select * from stu where name like '%%1%'").arg(name);
+    QString dname=QString("select id,name,course1,course2,course3,course4,course5,course6,course7,test0,sum from stu where name like '%%1%'").arg(name);
     model->setQuery(dname);//结果集
     //根据需求设置表头
     model->setHeaderData(0,Qt::Horizontal,"ID");
@@ -429,6 +434,7 @@ void MainWindow::on_find_name_clicked()
     //将view显示
     view->show();
     ui->widget_main->show();
+    ui->widget_gaojichazhao->close();
 
     ui->widget_de->show();
 
@@ -443,6 +449,7 @@ void MainWindow::on_find_name_clicked()
 void MainWindow::on_findbut_clicked()
 {
     ui->widget_main->show();
+    ui->widget_gaojichazhao->close();
     ui->widget_add->close();
     ui->widget_find1->show();
      ui->widget_find2->close();
@@ -456,6 +463,7 @@ void MainWindow::on_back_clicked()//返回主界面
 ui->lineEdit->clear();
 ui->lineEdit_2->clear();
     ui->widget_main->show();
+ui->widget_gaojichazhao->close();
     ui->widget_add->close();
     ui->widget_find1->close();
     ui->widget_find2->close();
@@ -469,10 +477,23 @@ void MainWindow::on_findbut_2_clicked()
 {
 //第一步和删除的第一步一样
     ui->widget_main->show();
+ui->widget_gaojichazhao->close();
     ui->widget_add->close();
     ui->widget_find1->show();
     ui->widget_find2->show();
     ui->widget_de->close();
+    ui->searchchoice->addItem("数理逻辑");
+     ui->searchchoice->addItem("集合论");
+     ui->searchchoice->addItem("抽象代数");
+     ui->searchchoice->addItem("图论");
+     ui->searchchoice->addItem("平时综合");
+      ui->searchchoice->addItem("期中测试");
+      ui->searchchoice->addItem("小论文");
+       ui->searchchoice->addItem("期末成绩");
+      ui->searchchoice->addItem("总评成绩");
+    ui->searchchoice->setCurrentText("总评成绩");
+
+
 }
 
 
@@ -577,6 +598,14 @@ QSqlQuery query;
     query.bindValue(":co6", student[i].course6);
     query.bindValue(":co7", student[i].course7);
     query.bindValue(":tt", student[i].test0);
+    // query.bindValue(":c1", student[i].s_course1);
+    // query.bindValue(":c2", student[i].s_course2);
+    // query.bindValue(":c3", student[i].s_course3);
+    // query.bindValue(":c4", student[i].s_course4);
+    // query.bindValue(":c5", student[i].s_course5);
+    // query.bindValue(":c6", student[i].s_course6);
+    // query.bindValue(":c7", student[i].s_course7);
+    // query.bindValue(":dtt", student[i].test);
     query.bindValue(":ff", student[i].final);
 
 
@@ -598,6 +627,7 @@ QSqlQuery query;
     ui->widget_find1->close();
     ui->widget_de->close();
     ui->widget_find2->close();
+    ui->widget_gaojichazhao->close();
 }
 
 
@@ -605,13 +635,191 @@ void MainWindow::on_back_2_clicked()
 {
     ui->lineEdit->clear();
     ui->lineEdit_2->clear();
+    ui->score_min->clear();
+    ui->score_max->clear();
     ui->widget_main->show();
     ui->widget_add->close();
     ui->widget_find1->close();
     ui->widget_find2->close();
     ui->widget_de->close();
+    ui->widget_gaojichazhao->close();
     refresh();
 }
 
 
+
+
+void MainWindow::on_searchmul_clicked()
+{
+    double min,max;
+    min=ui->score_min->text().toDouble();
+    max=ui->score_max->text().toDouble();
+    //QString subject;
+
+    if(ui->searchchoice->currentText()=="数理逻辑")scorecal(1,min,max);
+    if(ui->searchchoice->currentText()=="集合论")scorecal(2,min,max);
+    if(ui->searchchoice->currentText()=="抽象代数")scorecal(3,min,max);
+    if(ui->searchchoice->currentText()=="图论")scorecal(4,min,max);
+    if(ui->searchchoice->currentText()=="平时综合")scorecal(5,min,max);
+    if(ui->searchchoice->currentText()=="期中测试")scorecal(6,min,max);
+    if(ui->searchchoice->currentText()=="小论文")scorecal(7,min,max);
+    if(ui->searchchoice->currentText()=="期末成绩")scorecal(8,min,max);
+    if(ui->searchchoice->currentText()=="总评成绩")scorecal(9,min,max);
+
+    //scorecal(subject,min,max);
+}
+void MainWindow::scorecal(int n,double in,double ax)
+{
+    QString str;
+
+    switch (n) {
+    case 1:
+        for(int i=0;i<m_count;i++)
+        {
+            if(stusql[i].s_course1>=in&&stusql[i].s_course1<=ax)
+                str=str+stusql[i].s_id+"  "+stusql[i].s_name+"  "+stusql[i].course1+"  "+stusql[i].course2+"  "
+                      +stusql[i].course3+"  "+stusql[i].course4+"  "+stusql[i].course5+"  "
+                      +stusql[i].course6+"  "+stusql[i].course7+"  "+stusql[i].test0+"  "+QString::number(stusql[i].final)+'\n';
+        }
+
+        break;
+    case 2:
+        for(int i=0;i<m_count;i++)
+        {
+            if(stusql[i].s_course2>=in&&stusql[i].s_course2<=ax)
+                str=str+stusql[i].s_id+"  "+stusql[i].s_name+"  "+stusql[i].course1+"  "+stusql[i].course2+"  "
+                      +stusql[i].course3+"  "+stusql[i].course4+"  "+stusql[i].course5+"  "
+                      +stusql[i].course6+"  "+stusql[i].course7+"  "+stusql[i].test0+"  "+QString::number(stusql[i].final)+'\n';
+        }
+
+        break;
+    case 3:
+        for(int i=0;i<m_count;i++)
+        {
+            if(stusql[i].s_course3>=in&&stusql[i].s_course3<=ax)
+                str=str+stusql[i].s_id+"  "+stusql[i].s_name+"  "+stusql[i].course1+"  "+stusql[i].course2+"  "
+                      +stusql[i].course3+"  "+stusql[i].course4+"  "+stusql[i].course5+"  "
+                      +stusql[i].course6+"  "+stusql[i].course7+"  "+stusql[i].test0+"  "+QString::number(stusql[i].final)+'\n';
+        }
+
+        break;
+    case 4:
+        for(int i=0;i<m_count;i++)
+        {
+            if(stusql[i].s_course4>=in&&stusql[i].s_course4<=ax)
+                str=str+stusql[i].s_id+"  "+stusql[i].s_name+"  "+stusql[i].course1+"  "+stusql[i].course2+"  "
+                      +stusql[i].course3+"  "+stusql[i].course4+"  "+stusql[i].course5+"  "
+                      +stusql[i].course6+"  "+stusql[i].course7+"  "+stusql[i].test0+"  "+QString::number(stusql[i].final)+'\n';
+        }
+
+        break;
+    case 5:
+        for(int i=0;i<m_count;i++)
+        {
+            if(stusql[i].s_course5>=in&&stusql[i].s_course5<=ax)
+                str=str+stusql[i].s_id+"  "+stusql[i].s_name+"  "+stusql[i].course1+"  "+stusql[i].course2+"  "
+                      +stusql[i].course3+"  "+stusql[i].course4+"  "+stusql[i].course5+"  "
+                      +stusql[i].course6+"  "+stusql[i].course7+"  "+stusql[i].test0+"  "+QString::number(stusql[i].final)+'\n';
+        }
+
+        break;
+    case 6:
+        for(int i=0;i<m_count;i++)
+        {
+            if(stusql[i].s_course6>=in&&stusql[i].s_course6<=ax)
+                str=str+stusql[i].s_id+"  "+stusql[i].s_name+"  "+stusql[i].course1+"  "+stusql[i].course2+"  "
+                      +stusql[i].course3+"  "+stusql[i].course4+"  "+stusql[i].course5+"  "
+                      +stusql[i].course6+"  "+stusql[i].course7+"  "+stusql[i].test0+"  "+QString::number(stusql[i].final)+'\n';
+        }
+
+        break;
+    case 7:
+        for(int i=0;i<m_count;i++)
+        {
+            if(stusql[i].s_course7>=in&&stusql[i].s_course7<=ax)
+                str=str+stusql[i].s_id+"  "+stusql[i].s_name+"  "+stusql[i].course1+"  "+stusql[i].course2+"  "
+                      +stusql[i].course3+"  "+stusql[i].course4+"  "+stusql[i].course5+"  "
+                      +stusql[i].course6+"  "+stusql[i].course7+"  "+stusql[i].test0+"  "+QString::number(stusql[i].final)+'\n';
+        }
+
+        break;
+    case 8:
+        for(int i=0;i<m_count;i++)
+        {
+            if(stusql[i].test>=in&&stusql[i].test<=ax)
+                str=str+stusql[i].s_id+"  "+stusql[i].s_name+"  "+stusql[i].course1+"  "+stusql[i].course2+"  "
+                      +stusql[i].course3+"  "+stusql[i].course4+"  "+stusql[i].course5+"  "
+                      +stusql[i].course6+"  "+stusql[i].course7+"  "+stusql[i].test0+"  "+QString::number(stusql[i].final)+'\n';
+        }
+
+        break;
+    case 9:
+        for(int i=0;i<m_count;i++)
+        {
+            if(stusql[i].final>=in&&stusql[i].final<=ax)
+                str=str+stusql[i].s_id+"  "+stusql[i].s_name+"  "+stusql[i].course1+"  "+stusql[i].course2+"  "
+                      +stusql[i].course3+"  "+stusql[i].course4+"  "+stusql[i].course5+"  "
+                      +stusql[i].course6+"  "+stusql[i].course7+"  "+stusql[i].test0+"  "+QString::number(stusql[i].final)+'\n';
+        }
+
+        break;
+    default:
+        str="该分数段内没有匹配的学生！";
+        break;
+    }
+
+
+    ui->textEdit->setText(str);
+   ui->widget_main->close();
+    ui->widget_gaojichazhao->show();
+
+}
+
+void MainWindow::on_rankbut_clicked()
+{
+    //  model->setQuery("select * from stu order by sum desc");
+
+
+    // //给ui设置一个模型
+    // view=new QTableView(ui->widget_main);
+    // view->setFixedSize(QSize(1011,511));//设定窗口大小为固定大小
+
+    // view->setModel(model);//将数据联动到Ui上
+
+    // //将view显示
+    // view->show();
+    getallstu();
+}
+
+void MainWindow::getallstu()
+{
+    if(!alreadygetstu)
+    {
+        QSqlQuery query(db);
+    query.exec("select * from stu");
+    int i=0;//注意i=1，为了让排序第一个为1
+    double tmp=0;//为了算出double类型的成绩
+    while(query.next())
+    {
+        qDebug()<<i;
+
+        stusql[i].s_id=query.value(0).toString();
+        stusql[i].s_name=query.value(1).toString();
+        stusql[i].course1 =query.value(2).toString();
+        stusql[i].course2=query.value(3).toString();
+        stusql[i].course3=query.value(4).toString();
+        stusql[i].course4=query.value(5).toString();
+        stusql[i].course5=query.value(6).toString();
+        stusql[i].course6=query.value(7).toString();
+        stusql[i].course7=query.value(8).toString();
+        stusql[i].test0=query.value(9).toString();
+        stusql[i].final=query.value(10).toDouble();
+        tmp=stusql[i].getfinal();
+        qDebug()<<stusql[i].s_name;
+        i++;
+
+    }
+    }
+    alreadygetstu=true;
+}
 

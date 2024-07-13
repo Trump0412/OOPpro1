@@ -10,6 +10,8 @@
 #include<QTableView>
 #include<QMouseEvent>
 #include"stutmp.h"
+#include"stusql.h"
+using namespace std;
 class  sqlqueryModel;
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -26,6 +28,7 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     void refresh();
+    void scorecal(int n,double b,double c);
     // void mousePressEvent(QMouseEvent*e) override;
 private slots:
     void on_exit_clicked();
@@ -49,9 +52,16 @@ private slots:
     void on_openfilebut_clicked();
 
     void on_back_2_clicked();
+    void on_searchmul_clicked();
+
+    void on_rankbut_clicked();
+
+    void getallstu();
+
 private:
     int m_count=0;
     stutmp student[100];
+    stu stusql[100];
 
 private:
     Ui::MainWindow *ui;
@@ -59,5 +69,6 @@ private:
     sqlqueryModel* model;
     QTableView*view;
     bool delete_ok=false;
+    bool alreadygetstu=false;
 };
 #endif // MAINWINDOW_H

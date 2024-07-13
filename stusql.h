@@ -10,7 +10,11 @@ class stusql :public QObject
     Q_OBJECT
 public:
     stusql();
+
+
 };
+
+
 
 class stu
 {
@@ -36,6 +40,7 @@ public:
     double s_course6;
     double s_course7;
 
+    QString test0;
     double test;
     double final;
 
@@ -49,6 +54,7 @@ public:
     double getcourse7();
     double gettest();
     double getfinal();
+
 
 
 

@@ -133,6 +133,14 @@
        <string>查询</string>
       </property>
      </widget>
+     <zorder>treeView</zorder>
+     <zorder>addbut</zorder>
+     <zorder>openfilebut</zorder>
+     <zorder>rankbut</zorder>
+     <zorder>findbut</zorder>
+     <zorder>analysisbut</zorder>
+     <zorder>exit</zorder>
+     <zorder>findbut_2</zorder>
     </widget>
     <widget class="QWidget" name="widget_find1" native="true">
      <property name="geometry">
@@ -357,10 +365,10 @@
     <widget class="QWidget" name="widget_de" native="true">
      <property name="geometry">
       <rect>
-       <x>440</x>
-       <y>560</y>
-       <width>111</width>
-       <height>131</height>
+       <x>460</x>
+       <y>530</y>
+       <width>141</width>
+       <height>161</height>
       </rect>
      </property>
      <widget class="QPushButton" name="deletebut">
@@ -368,8 +376,8 @@
        <rect>
         <x>10</x>
         <y>30</y>
-        <width>92</width>
-        <height>28</height>
+        <width>111</width>
+        <height>51</height>
        </rect>
       </property>
       <property name="text">
@@ -381,8 +389,8 @@
        <rect>
         <x>10</x>
         <y>90</y>
-        <width>92</width>
-        <height>28</height>
+        <width>111</width>
+        <height>51</height>
        </rect>
       </property>
       <property name="text">
@@ -393,25 +401,25 @@
     <widget class="QWidget" name="widget_find2" native="true">
      <property name="geometry">
       <rect>
-       <x>540</x>
-       <y>510</y>
-       <width>341</width>
-       <height>141</height>
+       <x>660</x>
+       <y>520</y>
+       <width>361</width>
+       <height>181</height>
       </rect>
      </property>
      <widget class="QGroupBox" name="groupBox_3">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>0</x>
         <y>10</y>
-        <width>331</width>
-        <height>91</height>
+        <width>351</width>
+        <height>121</height>
        </rect>
       </property>
       <property name="title">
        <string>查询方式3:</string>
       </property>
-      <widget class="QComboBox" name="subject">
+      <widget class="QComboBox" name="searchchoice">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -480,27 +488,40 @@
         <string>分</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushButton_2">
+      <widget class="QPushButton" name="searchmul">
        <property name="geometry">
         <rect>
-         <x>130</x>
-         <y>60</y>
-         <width>92</width>
-         <height>28</height>
+         <x>120</x>
+         <y>70</y>
+         <width>101</width>
+         <height>41</height>
         </rect>
        </property>
        <property name="text">
         <string>按成绩查找</string>
        </property>
       </widget>
+      <widget class="QLabel" name="label_9">
+       <property name="geometry">
+        <rect>
+         <x>280</x>
+         <y>30</y>
+         <width>69</width>
+         <height>19</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>(请填数字）</string>
+       </property>
+      </widget>
      </widget>
      <widget class="QPushButton" name="back_2">
       <property name="geometry">
        <rect>
-        <x>140</x>
-        <y>110</y>
-        <width>92</width>
-        <height>28</height>
+        <x>110</x>
+        <y>140</y>
+        <width>111</width>
+        <height>31</height>
        </rect>
       </property>
       <property name="text">
@@ -508,11 +529,32 @@
       </property>
      </widget>
     </widget>
+    <widget class="QWidget" name="widget_gaojichazhao" native="true">
+     <property name="geometry">
+      <rect>
+       <x>160</x>
+       <y>20</y>
+       <width>1041</width>
+       <height>511</height>
+      </rect>
+     </property>
+     <widget class="QTextEdit" name="textEdit">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>-10</y>
+        <width>1021</width>
+        <height>511</height>
+       </rect>
+      </property>
+     </widget>
+    </widget>
     <zorder>widget_add</zorder>
+    <zorder>widget_main</zorder>
     <zorder>widget_find1</zorder>
     <zorder>widget_de</zorder>
     <zorder>widget_find2</zorder>
-    <zorder>widget_main</zorder>
+    <zorder>widget_gaojichazhao</zorder>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">

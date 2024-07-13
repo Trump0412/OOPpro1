@@ -11,18 +11,21 @@ CONFIG += c++17
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
+    rank.cpp \
     sqlquerymodel.cpp \
     stusql.cpp \
     stutmp.cpp
 
 HEADERS += \
     mainwindow.h \
+    rank.h \
     sqlquerymodel.h \
     stusql.h \
     stutmp.h
 
 FORMS += \
-    mainwindow.ui
+    mainwindow.ui \
+    rank.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
