@@ -56,6 +56,10 @@ public:
     double getfinal();
 
 
+    stu();
+    stu(const stu&c);
+    stu(QString id, QString name, QString c1, QString c2, QString c3, QString c4, QString c5, QString c6, QString c7, QString t);
+
 
 
 
@@ -64,5 +68,6 @@ public:
 
 
 };
+bool operator>(const stu&a,const stu&b);
 
 #endif // STUSQL_H

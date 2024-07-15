@@ -1,4 +1,5 @@
 QT       += core gui sql
+QT       += charts
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -11,21 +12,18 @@ CONFIG += c++17
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
-    rank.cpp \
     sqlquerymodel.cpp \
     stusql.cpp \
     stutmp.cpp
 
 HEADERS += \
     mainwindow.h \
-    rank.h \
     sqlquerymodel.h \
     stusql.h \
     stutmp.h
 
 FORMS += \
-    mainwindow.ui \
-    rank.ui
+    mainwindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -33,5 +31,18 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 DISTFILES += \
-    19DE.txt \
-    readme.txt
+    19DE - 副本.txt \
+    19DE .txt \
+    19DE .txt \
+    19DE1 .txt \
+    19DE1 .txt \
+    19DE1 .txt \
+    19DE1 .txt \
+    19DE1 .txt \
+    19DE1 .txt \
+    19DE1 .txt \
+    19DE1 .txt \
+    19DE1 .txt \
+    rank0.txt \
+    readme.txt \
+    stu.txt

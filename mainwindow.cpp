@@ -24,7 +24,7 @@ MainWindow::MainWindow(QWidget *parent)
     setWindowTitle(tr("学生成绩管理系统"));
     //1.根据数据类型链接数据库
     db= QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName("oop04.db");
+    db.setDatabaseName("oop05.db");
     //2.打开
     if(!db.open())
     {
@@ -115,6 +115,15 @@ MainWindow::MainWindow(QWidget *parent)
     ui->widget_de->close();
      ui->widget_find2->close();
       ui->widget_gaojichazhao->close();
+       ui->widget_rank->close();
+      ui->widget_ana->close();
+
+
+      QChartView *chartview;
+      chartview=new QChartView(createbarchart());
+      ui->horizontalLayout_2->insertWidget(0,chartview);
+
+
 
 }
 
@@ -191,6 +200,11 @@ void MainWindow::on_addbut_clicked()
     //     版权声明：本文为博主原创文章，遵循 CC 4.0 BY-SA 版权协议，转载请附上原文出处链接和本声明。
 
     //             原文链接：https://blog.csdn.net/qq_24127015/article/details/100516198
+     int i=m_count+1;
+     QString addstr="_"+QString::number(i);
+
+
+     ui->numberedit->setText(addstr);
 }
 
 
@@ -338,6 +352,8 @@ void MainWindow::on_deletebut_clicked()
     }
 
    delete_ok=false;
+    alreadygetstu=false;
+   getallstu();
 }
 
 
@@ -346,9 +362,9 @@ void MainWindow::on_pushButton_clicked()//增加学生的确认
     //1.获取ui上的内容
     QString id=ui->idedit->text();
     QString name=ui->nameedit->text();
-    QString math=ui->mathedit->text();
-    QString physics=ui->physicsedit->text();
-    QString english=ui->englishedit->text();
+    QString math=ui->course1dit->text();
+    QString physics=ui->course2dit->text();
+    QString english=ui->course3dit->text();
     //2.数据插入到数据库（通过数据库接口的访问）
     QSqlQuery query;
 
@@ -374,6 +390,7 @@ void MainWindow::on_find_id_clicked()
     QString id=ui->lineEdit->text();
 
     QString did=QString("select id,name,course1,course2,course3,course4,course5,course6,course7,test0,sum from stu where id=%1").arg(id);
+   // model =new sqlqueryModel;
     model->setQuery(did);//结果集
     //根据需求设置表头
     model->setHeaderData(0,Qt::Horizontal,"ID");
@@ -502,6 +519,9 @@ void MainWindow::on_openfilebut_clicked()
     QFileInfo info(QFileDialog::getOpenFileName());
     QString  file_path = info.filePath();
     QString  file_name = info.fileName();
+
+    File_Path=file_path;//保存文件路径
+
     if(file_path.isEmpty()) return;
     QFile *opened_file = new QFile(file_path);
     if(!opened_file->exists())
@@ -598,14 +618,7 @@ QSqlQuery query;
     query.bindValue(":co6", student[i].course6);
     query.bindValue(":co7", student[i].course7);
     query.bindValue(":tt", student[i].test0);
-    // query.bindValue(":c1", student[i].s_course1);
-    // query.bindValue(":c2", student[i].s_course2);
-    // query.bindValue(":c3", student[i].s_course3);
-    // query.bindValue(":c4", student[i].s_course4);
-    // query.bindValue(":c5", student[i].s_course5);
-    // query.bindValue(":c6", student[i].s_course6);
-    // query.bindValue(":c7", student[i].s_course7);
-    // query.bindValue(":dtt", student[i].test);
+
     query.bindValue(":ff", student[i].final);
 
 
@@ -651,6 +664,7 @@ void MainWindow::on_back_2_clicked()
 
 void MainWindow::on_searchmul_clicked()
 {
+    getallstu();
     double min,max;
     min=ui->score_min->text().toDouble();
     max=ui->score_max->text().toDouble();
@@ -674,92 +688,110 @@ void MainWindow::scorecal(int n,double in,double ax)
 
     switch (n) {
     case 1:
+        str=QString("      id        name   数理逻辑 集合论 抽象代数 图论 平时综合 期中测试 小论文 期末成绩 总评成绩 ");
+        str=str+'\n';
         for(int i=0;i<m_count;i++)
         {
             if(stusql[i].s_course1>=in&&stusql[i].s_course1<=ax)
-                str=str+stusql[i].s_id+"  "+stusql[i].s_name+"  "+stusql[i].course1+"  "+stusql[i].course2+"  "
-                      +stusql[i].course3+"  "+stusql[i].course4+"  "+stusql[i].course5+"  "
-                      +stusql[i].course6+"  "+stusql[i].course7+"  "+stusql[i].test0+"  "+QString::number(stusql[i].final)+'\n';
+                str=str+stusql[i].s_id+"  "+stusql[i].s_name+"        "+stusql[i].course1+"           "+stusql[i].course2+"           "
+                      +stusql[i].course3+"         "+stusql[i].course4+"         "+stusql[i].course5+"            "
+                      +stusql[i].course6+"        "+stusql[i].course7+"         "+stusql[i].test0+"           "+QString::number(stusql[i].final)+'\n';
         }
 
         break;
     case 2:
+        str=QString("      id        name   数理逻辑 集合论 抽象代数 图论 平时综合 期中测试 小论文 期末成绩 总评成绩 ");
+        str=str+'\n';
         for(int i=0;i<m_count;i++)
         {
             if(stusql[i].s_course2>=in&&stusql[i].s_course2<=ax)
-                str=str+stusql[i].s_id+"  "+stusql[i].s_name+"  "+stusql[i].course1+"  "+stusql[i].course2+"  "
-                      +stusql[i].course3+"  "+stusql[i].course4+"  "+stusql[i].course5+"  "
-                      +stusql[i].course6+"  "+stusql[i].course7+"  "+stusql[i].test0+"  "+QString::number(stusql[i].final)+'\n';
+                str=str+stusql[i].s_id+"  "+stusql[i].s_name+"        "+stusql[i].course1+"           "+stusql[i].course2+"           "
+                      +stusql[i].course3+"         "+stusql[i].course4+"         "+stusql[i].course5+"            "
+                      +stusql[i].course6+"        "+stusql[i].course7+"         "+stusql[i].test0+"           "+QString::number(stusql[i].final)+'\n';
         }
 
         break;
     case 3:
+        str=QString("      id        name   数理逻辑 集合论 抽象代数 图论 平时综合 期中测试 小论文 期末成绩 总评成绩 ");
+        str=str+'\n';
         for(int i=0;i<m_count;i++)
         {
             if(stusql[i].s_course3>=in&&stusql[i].s_course3<=ax)
-                str=str+stusql[i].s_id+"  "+stusql[i].s_name+"  "+stusql[i].course1+"  "+stusql[i].course2+"  "
-                      +stusql[i].course3+"  "+stusql[i].course4+"  "+stusql[i].course5+"  "
-                      +stusql[i].course6+"  "+stusql[i].course7+"  "+stusql[i].test0+"  "+QString::number(stusql[i].final)+'\n';
+                str=str+stusql[i].s_id+"  "+stusql[i].s_name+"        "+stusql[i].course1+"           "+stusql[i].course2+"           "
+                      +stusql[i].course3+"         "+stusql[i].course4+"         "+stusql[i].course5+"            "
+                      +stusql[i].course6+"        "+stusql[i].course7+"         "+stusql[i].test0+"           "+QString::number(stusql[i].final)+'\n';
         }
 
         break;
     case 4:
+        str=QString("      id        name   数理逻辑 集合论 抽象代数 图论 平时综合 期中测试 小论文 期末成绩 总评成绩 ");
+        str=str+'\n';
         for(int i=0;i<m_count;i++)
         {
             if(stusql[i].s_course4>=in&&stusql[i].s_course4<=ax)
-                str=str+stusql[i].s_id+"  "+stusql[i].s_name+"  "+stusql[i].course1+"  "+stusql[i].course2+"  "
-                      +stusql[i].course3+"  "+stusql[i].course4+"  "+stusql[i].course5+"  "
-                      +stusql[i].course6+"  "+stusql[i].course7+"  "+stusql[i].test0+"  "+QString::number(stusql[i].final)+'\n';
+                str=str+stusql[i].s_id+"  "+stusql[i].s_name+"        "+stusql[i].course1+"           "+stusql[i].course2+"           "
+                      +stusql[i].course3+"         "+stusql[i].course4+"         "+stusql[i].course5+"            "
+                      +stusql[i].course6+"        "+stusql[i].course7+"         "+stusql[i].test0+"           "+QString::number(stusql[i].final)+'\n';
         }
 
         break;
     case 5:
+        str=QString("      id        name   数理逻辑 集合论 抽象代数 图论 平时综合 期中测试 小论文 期末成绩 总评成绩 ");
+        str=str+'\n';
         for(int i=0;i<m_count;i++)
         {
             if(stusql[i].s_course5>=in&&stusql[i].s_course5<=ax)
-                str=str+stusql[i].s_id+"  "+stusql[i].s_name+"  "+stusql[i].course1+"  "+stusql[i].course2+"  "
-                      +stusql[i].course3+"  "+stusql[i].course4+"  "+stusql[i].course5+"  "
-                      +stusql[i].course6+"  "+stusql[i].course7+"  "+stusql[i].test0+"  "+QString::number(stusql[i].final)+'\n';
+                str=str+stusql[i].s_id+"  "+stusql[i].s_name+"        "+stusql[i].course1+"           "+stusql[i].course2+"           "
+                      +stusql[i].course3+"         "+stusql[i].course4+"         "+stusql[i].course5+"            "
+                      +stusql[i].course6+"        "+stusql[i].course7+"         "+stusql[i].test0+"           "+QString::number(stusql[i].final)+'\n';
         }
 
         break;
     case 6:
+        str=QString("      id        name   数理逻辑 集合论 抽象代数 图论 平时综合 期中测试 小论文 期末成绩 总评成绩 ");
+        str=str+'\n';
         for(int i=0;i<m_count;i++)
         {
             if(stusql[i].s_course6>=in&&stusql[i].s_course6<=ax)
-                str=str+stusql[i].s_id+"  "+stusql[i].s_name+"  "+stusql[i].course1+"  "+stusql[i].course2+"  "
-                      +stusql[i].course3+"  "+stusql[i].course4+"  "+stusql[i].course5+"  "
-                      +stusql[i].course6+"  "+stusql[i].course7+"  "+stusql[i].test0+"  "+QString::number(stusql[i].final)+'\n';
+                str=str+stusql[i].s_id+"  "+stusql[i].s_name+"        "+stusql[i].course1+"           "+stusql[i].course2+"           "
+                      +stusql[i].course3+"         "+stusql[i].course4+"         "+stusql[i].course5+"            "
+                      +stusql[i].course6+"        "+stusql[i].course7+"         "+stusql[i].test0+"           "+QString::number(stusql[i].final)+'\n';
         }
 
         break;
     case 7:
+        str=QString("      id        name   数理逻辑 集合论 抽象代数 图论 平时综合 期中测试 小论文 期末成绩 总评成绩 ");
+        str=str+'\n';
         for(int i=0;i<m_count;i++)
         {
             if(stusql[i].s_course7>=in&&stusql[i].s_course7<=ax)
-                str=str+stusql[i].s_id+"  "+stusql[i].s_name+"  "+stusql[i].course1+"  "+stusql[i].course2+"  "
-                      +stusql[i].course3+"  "+stusql[i].course4+"  "+stusql[i].course5+"  "
-                      +stusql[i].course6+"  "+stusql[i].course7+"  "+stusql[i].test0+"  "+QString::number(stusql[i].final)+'\n';
+                str=str+stusql[i].s_id+"  "+stusql[i].s_name+"        "+stusql[i].course1+"           "+stusql[i].course2+"           "
+                      +stusql[i].course3+"         "+stusql[i].course4+"         "+stusql[i].course5+"            "
+                      +stusql[i].course6+"        "+stusql[i].course7+"         "+stusql[i].test0+"           "+QString::number(stusql[i].final)+'\n';
         }
 
         break;
     case 8:
+        str=QString("      id        name   数理逻辑 集合论 抽象代数 图论 平时综合 期中测试 小论文 期末成绩 总评成绩 ");
+        str=str+'\n';
         for(int i=0;i<m_count;i++)
         {
             if(stusql[i].test>=in&&stusql[i].test<=ax)
-                str=str+stusql[i].s_id+"  "+stusql[i].s_name+"  "+stusql[i].course1+"  "+stusql[i].course2+"  "
-                      +stusql[i].course3+"  "+stusql[i].course4+"  "+stusql[i].course5+"  "
-                      +stusql[i].course6+"  "+stusql[i].course7+"  "+stusql[i].test0+"  "+QString::number(stusql[i].final)+'\n';
+                str=str+stusql[i].s_id+"  "+stusql[i].s_name+"        "+stusql[i].course1+"           "+stusql[i].course2+"           "
+                      +stusql[i].course3+"         "+stusql[i].course4+"         "+stusql[i].course5+"            "
+                      +stusql[i].course6+"        "+stusql[i].course7+"         "+stusql[i].test0+"           "+QString::number(stusql[i].final)+'\n';
         }
 
         break;
     case 9:
+        str=QString("      id        name   数理逻辑 集合论 抽象代数 图论 平时综合 期中测试 小论文 期末成绩 总评成绩 ");
+        str=str+'\n';
         for(int i=0;i<m_count;i++)
         {
             if(stusql[i].final>=in&&stusql[i].final<=ax)
-                str=str+stusql[i].s_id+"  "+stusql[i].s_name+"  "+stusql[i].course1+"  "+stusql[i].course2+"  "
-                      +stusql[i].course3+"  "+stusql[i].course4+"  "+stusql[i].course5+"  "
-                      +stusql[i].course6+"  "+stusql[i].course7+"  "+stusql[i].test0+"  "+QString::number(stusql[i].final)+'\n';
+                str=str+stusql[i].s_id+"  "+stusql[i].s_name+"        "+stusql[i].course1+"           "+stusql[i].course2+"           "
+                      +stusql[i].course3+"         "+stusql[i].course4+"         "+stusql[i].course5+"            "
+                      +stusql[i].course6+"        "+stusql[i].course7+"         "+stusql[i].test0+"           "+QString::number(stusql[i].final)+'\n';
         }
 
         break;
@@ -767,7 +799,7 @@ void MainWindow::scorecal(int n,double in,double ax)
         str="该分数段内没有匹配的学生！";
         break;
     }
-
+    ui->textEdit->clear();
 
     ui->textEdit->setText(str);
    ui->widget_main->close();
@@ -789,6 +821,31 @@ void MainWindow::on_rankbut_clicked()
     // //将view显示
     // view->show();
     getallstu();
+    ui->textEdit->clear();
+    QString str;
+    str=QString("      id        name   数理逻辑 集合论 抽象代数 图论 平时综合 期中测试 小论文 期末成绩 总评成绩 ");
+    str=str+'\n';
+
+    rankstu();
+
+    for(int i=0;i<m_count;i++)
+    {
+            str=str+stusql[i].s_id+"  "+stusql[i].s_name+"        "+stusql[i].course1+"           "+stusql[i].course2+"           "
+                  +stusql[i].course3+"         "+stusql[i].course4+"         "+stusql[i].course5+"            "
+                  +stusql[i].course6+"        "+stusql[i].course7+"         "+stusql[i].test0+"           "+QString::number(stusql[i].final)+'\n';
+    }
+
+    ui->textEdit->setText(str);
+    ui->widget_main->close();
+    ui->widget_gaojichazhao->show();
+
+    ui->widget_add->close();
+    ui->widget_find1->close();
+    ui->widget_de->close();
+    ui->widget_find2->close();
+    ui->widget_rank->show();
+
+
 }
 
 void MainWindow::getallstu()
@@ -821,5 +878,736 @@ void MainWindow::getallstu()
     }
     }
     alreadygetstu=true;
+}
+
+
+void MainWindow::on_back_rank_clicked()
+{
+    ui->widget_main->show();
+    ui->widget_gaojichazhao->close();
+
+    ui->widget_add->close();
+    ui->widget_find1->close();
+    ui->widget_de->close();
+    ui->widget_find2->close();
+    ui->widget_rank->close();
+    getallstu();
+    refresh();
+}
+
+void MainWindow::rankstu()
+{
+    bool noswap;
+
+
+    for (int i = 0; i < m_count-1; i++)
+    {
+        noswap = true;
+        for (int j = m_count - 1; j > i; j--)
+        {
+            if (stusql[j]> stusql[j - 1])
+            {
+                stu tmp = stusql[j];
+                stusql[j] = stusql[j - 1];
+                stusql[j - 1] = tmp;
+                noswap = false;
+            }
+        }
+        if (noswap)break;
+    }
+    alreadygetstu=false;//等待之后重新按原顺序排列
+}
+
+void MainWindow::getaverage(int n)
+{
+    double sum=0;
+    double ave=0;
+    switch(n)
+    {
+    case 1:
+        for(int i=0;i<m_count;i++)
+        {
+            sum+=stusql[i].s_course1;
+        }
+        ave=sum/m_count;
+        ui->aveline->setText(QString::number(ave));
+
+        break;
+    case 2:
+        for(int i=0;i<m_count;i++)
+        {
+            sum+=stusql[i].s_course2;
+        }
+        ave=sum/m_count;
+        ui->aveline->setText(QString::number(ave));
+        break;
+    case 3:
+        for(int i=0;i<m_count;i++)
+        {
+            sum+=stusql[i].s_course3;
+        }
+        ave=sum/m_count;
+        ui->aveline->setText(QString::number(ave));
+        break;
+    case 4:
+        for(int i=0;i<m_count;i++)
+        {
+            sum+=stusql[i].s_course4;
+        }
+        ave=sum/m_count;
+        ui->aveline->setText(QString::number(ave));
+        break;
+    case 5:
+        for(int i=0;i<m_count;i++)
+        {
+            sum+=stusql[i].s_course5;
+        }
+        ave=sum/m_count;
+        ui->aveline->setText(QString::number(ave));
+        break;
+    case 6:
+        for(int i=0;i<m_count;i++)
+        {
+            sum+=stusql[i].s_course6;
+        }
+        ave=sum/m_count;
+        ui->aveline->setText(QString::number(ave));
+        break;
+    case 7:
+        for(int i=0;i<m_count;i++)
+        {
+            sum+=stusql[i].s_course7;
+        }
+        ave=sum/m_count;
+        ui->aveline->setText(QString::number(ave));
+        break;
+    case 8:
+        for(int i=0;i<m_count;i++)
+        {
+            sum+=stusql[i].test;
+        }
+        ave=sum/m_count;
+        ui->aveline->setText(QString::number(ave));
+        break;
+    case 9:
+        for(int i=0;i<m_count;i++)
+        {
+            sum+=stusql[i].final;
+        }
+        ave=sum/m_count;
+        m_ave=ave;
+        ui->aveline->setText(QString::number(ave));
+        break;
+
+    }
+}
+
+void MainWindow::getsd(int n)
+{
+    double tmp=0;
+    double sum=0;
+    double ave=0;
+    double sd=0;
+    switch(n)
+    {
+    case 1:
+        for(int i=0;i<m_count;i++)
+        {
+            sum+=stusql[i].s_course1;
+        }
+        ave=sum/m_count;
+        for(int i=0;i<m_count;i++)
+        {
+            tmp+=(stusql[i].s_course1-ave)*(stusql[i].s_course1-ave);
+        }
+
+        sd=sqrt(tmp/m_count);
+        ui->sdline->setText(QString::number(sd));
+        break;
+    case 2:
+        for(int i=0;i<m_count;i++)
+        {
+            sum+=stusql[i].s_course2;
+        }
+        ave=sum/m_count;
+        for(int i=0;i<m_count;i++)
+        {
+            tmp+=(stusql[i].s_course2-ave)*(stusql[i].s_course2-ave);
+        }
+
+        sd=sqrt(tmp/m_count);
+        ui->sdline->setText(QString::number(sd));
+        break;
+    case 3:
+        for(int i=0;i<m_count;i++)
+        {
+            sum+=stusql[i].s_course3;
+        }
+        ave=sum/m_count;
+        for(int i=0;i<m_count;i++)
+        {
+            tmp+=(stusql[i].s_course3-ave)*(stusql[i].s_course3-ave);
+        }
+
+        sd=sqrt(tmp/m_count);
+        ui->sdline->setText(QString::number(sd));
+        break;
+    case 4:
+        for(int i=0;i<m_count;i++)
+        {
+            sum+=stusql[i].s_course4;
+        }
+        ave=sum/m_count;
+        for(int i=0;i<m_count;i++)
+        {
+            tmp+=(stusql[i].s_course4-ave)*(stusql[i].s_course4-ave);
+        }
+
+        sd=sqrt(tmp/m_count);
+        ui->sdline->setText(QString::number(sd));
+        break;
+    case 5:
+        for(int i=0;i<m_count;i++)
+        {
+            sum+=stusql[i].s_course5;
+        }
+        ave=sum/m_count;
+        for(int i=0;i<m_count;i++)
+        {
+            tmp+=(stusql[i].s_course5-ave)*(stusql[i].s_course5-ave);
+        }
+
+        sd=sqrt(tmp/m_count);
+        ui->sdline->setText(QString::number(sd));
+        break;
+    case 6:
+        for(int i=0;i<m_count;i++)
+        {
+            sum+=stusql[i].s_course6;
+        }
+        ave=sum/m_count;
+        for(int i=0;i<m_count;i++)
+        {
+            tmp+=(stusql[i].s_course6-ave)*(stusql[i].s_course6-ave);
+        }
+
+        sd=sqrt(tmp/m_count);
+        ui->sdline->setText(QString::number(sd));
+        break;
+    case 7:
+        for(int i=0;i<m_count;i++)
+        {
+            sum+=stusql[i].s_course7;
+        }
+        ave=sum/m_count;
+        for(int i=0;i<m_count;i++)
+        {
+            tmp+=(stusql[i].s_course7-ave)*(stusql[i].s_course7-ave);
+        }
+
+        sd=sqrt(tmp/m_count);
+        ui->sdline->setText(QString::number(sd));
+        break;
+    case 8:
+        for(int i=0;i<m_count;i++)
+        {
+            sum+=stusql[i].test;
+        }
+        ave=sum/m_count;
+        for(int i=0;i<m_count;i++)
+        {
+            tmp+=(stusql[i].test-ave)*(stusql[i].test-ave);
+        }
+
+        sd=sqrt(tmp/m_count);
+        ui->sdline->setText(QString::number(sd));
+        break;
+    case 9:
+        for(int i=0;i<m_count;i++)
+        {
+            sum+=stusql[i].final;
+        }
+        ave=sum/m_count;
+        for(int i=0;i<m_count;i++)
+        {
+            tmp+=(stusql[i].final-ave)*(stusql[i].final-ave);
+        }
+
+        sd=sqrt(tmp/m_count);
+        ui->sdline->setText(QString::number(sd));
+        break;
+
+    }
+}
+
+void MainWindow::getpassrate(int n)
+{
+    double passor=0;
+    double passr=0.00;
+    double m_count1=QString::number(m_count).toDouble();
+    switch(n)
+    {
+    case 1:
+        for(int i=0;i<m_count;i++)
+        {
+            if(stusql[i].s_course1>=3)
+                passor++;
+        }
+        passr=passor/m_count1;
+        passr=passr*100;
+        ui->passrateline->setText(QString::number(passr)+"%");
+        break;
+    case 2:
+        for(int i=0;i<m_count;i++)
+        {
+            if(stusql[i].s_course2>=3)
+                passor++;
+        }
+        passr=passor/m_count1;
+        passr=passr*100;
+        ui->passrateline->setText(QString::number(passr)+"%");
+        break;
+    case 3:
+        for(int i=0;i<m_count;i++)
+        {
+            if(stusql[i].s_course3>=3)
+                passor++;
+        }
+        passr=passor/m_count1;
+        passr=passr*100;
+        ui->passrateline->setText(QString::number(passr)+"%");
+        break;
+    case 4:
+        for(int i=0;i<m_count;i++)
+        {
+            if(stusql[i].s_course4>=3)
+                passor++;
+        }
+        passr=passor/m_count1;
+        passr=passr*100;
+        ui->passrateline->setText(QString::number(passr)+"%");
+        break;
+    case 5:
+        for(int i=0;i<m_count;i++)
+        {
+            if(stusql[i].s_course5>=6)
+                passor++;
+        }
+        passr=passor/m_count1;
+        passr=passr*100;
+        ui->passrateline->setText(QString::number(passr)+"%");
+        break;
+    case 6:
+        for(int i=0;i<m_count;i++)
+        {
+            if(stusql[i].s_course6>=6)
+                passor++;
+        }
+        passr=passor/m_count1;
+        passr=passr*100;
+        ui->passrateline->setText(QString::number(passr)+"%");
+        break;
+    case 7:
+        for(int i=0;i<m_count;i++)
+        {
+            if(stusql[i].s_course7>=6)
+                passor++;
+        }
+       // qDebug()<<passor;
+
+        passr=passor/m_count1;
+        passr=passr*100;
+        ui->passrateline->setText(QString::number(passr)+"%");
+        break;
+    case 8:
+        for(int i=0;i<m_count;i++)
+        {
+            if(stusql[i].test>=60)
+                passor++;
+        }
+        passr=passor/m_count1;
+        passr=passr*100;
+        ui->passrateline->setText(QString::number(passr)+"%");
+        break;
+    case 9:
+        for(int i=0;i<m_count;i++)
+        {
+            if(stusql[i].final>=60)
+                passor++;
+        }
+        passr=passor/m_count1;
+        passr=passr*100;
+        ui->passrateline->setText(QString::number(passr)+"%");
+        break;
+
+    }
+}
+
+QChart *MainWindow::createbarchart() const
+{
+    QChart *chart = new QChart();
+    chart->setTitle("分数段的人数直方图");
+
+    QBarSet *set0 = new QBarSet("本班学生总评成绩");
+    //QBarSet *set1 = new QBarSet("B日常开支");
+//这里可以设置为for循环统计各分数段学生数目，为方便节约时间故省略
+    *set0 << 1 << 11 << 17 << 19 << 25 ;
+  //  *set1 << 766 << 435 << 3225 << 1348 << 4883 << 233;
+
+
+    QBarSeries  *series = new QBarSeries (chart);
+    series->append(set0);
+   // series->append(set1);
+
+
+    chart->addSeries(series);
+    chart->setAnimationOptions(QChart::SeriesAnimations);
+
+    QStringList categories;
+    categories << "60以下" << "60-70" << "70-80" << "80-90" << "90-100" ;  //保存横坐标字符串的列表
+    QBarCategoryAxis *axis = new QBarCategoryAxis();
+    axis->append(categories);
+    chart->createDefaultAxes();
+    chart->setAxisX(axis, series);
+    chart->axes(Qt::Vertical).first()->setRange(0,30);
+    // Add space to label to add space between labels and axis在标签和轴之间加空格
+    QValueAxis *axisY = qobject_cast<QValueAxis*>(chart->axes(Qt::Vertical).first());
+    Q_ASSERT(axisY);
+    //axisY->setLabelFormat("%.2f  ");
+     axisY->setLabelFormat("%d  ");
+
+    series->setLabelsPosition(QAbstractBarSeries::LabelsInsideEnd);  //设置标签显示的位置
+    series->setLabelsVisible(true);  //设置数据标签可见
+
+    //设置主题
+    chart->setTheme(QChart::ChartThemeBlueCerulean);
+
+    return chart;
+
+}
+
+QChart *MainWindow::createScatterChart() const
+{
+    // scatter chart
+    QChart *chart = new QChart();
+    chart->setTitle("以平均分为参照的散点图");
+
+    QScatterSeries *scatterSeries1 = new QScatterSeries(chart);
+   // QScatterSeries *scatterSeries2 = new QScatterSeries(chart);
+
+    scatterSeries1->setName("本班学生总评成绩");
+    scatterSeries1->setPointLabelsFormat("@yPoint");
+  //  scatterSeries1->setPointLabelsVisible();//让它不可见
+    scatterSeries1->setMarkerSize(9);
+
+    // scatterSeries2->setName("B店铺接单数");
+    // scatterSeries2->setPointLabelsFormat("@yPoint");
+    // scatterSeries2->setPointLabelsVisible();
+    // scatterSeries2->setMarkerSize(16);
+
+    double value;
+    for(int i=0;i<m_count;i++)
+    {
+        value=stusql[i].final-m_ave;
+        scatterSeries1->append(i,value);
+        qDebug()<<i<<" "<<value;
+    }
+    // scatterSeries1->append(0,6);
+    // scatterSeries1->append(1,10);
+    // scatterSeries1->append(4,12);
+    // scatterSeries1->append(6,5);
+
+    // scatterSeries2->append(0,18);
+    // scatterSeries2->append(3,13);
+    // scatterSeries2->append(5,7);
+    // scatterSeries2->append(6,2);
+    chart->addSeries(scatterSeries1);
+    //chart->addSeries(scatterSeries2);
+
+
+    chart->createDefaultAxes();
+    chart->axes(Qt::Horizontal).first()->setRange(0, 75);// x轴范围
+    chart->axes(Qt::Vertical).first()->setRange(-40, 40);// y轴范围
+    // Add space to label to add space between labels and axis在标签和轴之间加空格
+    QValueAxis *axisY = qobject_cast<QValueAxis*>(chart->axes(Qt::Vertical).first());
+    Q_ASSERT(axisY);
+    axisY->setLabelFormat("%.1f ");
+
+    QValueAxis *axisX = qobject_cast<QValueAxis*>(chart->axes(Qt::Horizontal).first());
+
+    axisY->setLabelFormat("%d ");
+ Q_ASSERT(axisX);
+
+
+    chart->setTheme(QChart::ChartThemeLight);
+    return chart;
+
+}
+
+
+void MainWindow::on_writebut_clicked()
+{
+    QFileInfo info(QFileDialog::getOpenFileName());
+    QString  file_path = info.filePath();
+    QString  file_name = info.fileName();
+    if(file_path.isEmpty()) return;
+    QFile *opened_file = new QFile(file_path);
+    if(!opened_file->exists())
+    {
+
+        enum QMessageBox::StandardButton ret = QMessageBox::warning(nullptr,"警告","文件不存在",QMessageBox::Retry|QMessageBox::Cancel);
+        switch(ret)
+        {
+        case QMessageBox::Retry:
+            on_writebut_clicked();
+            break;
+        default:
+            return;
+            break;
+        }
+
+        return;
+    }
+    //setWindowTitle(file_name);
+    opened_file->open(QIODeviceBase::WriteOnly|QIODeviceBase::Text);
+    QTextStream fs(opened_file);
+   // QString id,name,c1,c2,c3,c4,c5,c6,c7;
+   // QString t;
+    fs<<QString("      id        name   数理逻辑 集合论 抽象代数 图论 平时综合 期中测试 小论文 期末成绩 总评成绩 ");
+    fs<<'\n';
+    for(int i=0;i<m_count;i++)
+    {
+        fs<< stusql[i].s_id<<"  "<<stusql[i].s_name<<"        "<<stusql[i].course1<<"           "<<stusql[i].course2<<"           "
+           <<stusql[i].course3<<"         "<<stusql[i].course4<<"         "<<stusql[i].course5<<"            "
+           <<stusql[i].course6<<"        "<<stusql[i].course7<<"         "<<stusql[i].test0<<"           "<<stusql[i].final<<'\n';
+    }
+
+    opened_file->close();
+    QMessageBox::information(this,"successed","成功写入文件");
+}
+
+
+void MainWindow::on_updatebut_clicked()
+{
+    getallstu();
+    QFile *opened_file = new QFile(File_Path);
+    opened_file->open(QIODeviceBase::WriteOnly|QIODeviceBase::Text);
+    QTextStream fs(opened_file);
+    for(int i=0;i<m_count;i++)
+    {
+        fs<< stusql[i].s_id<<" "<<stusql[i].s_name<<" "<<stusql[i].course1<<" "<<stusql[i].course2<<" "
+           <<stusql[i].course3<<" "<<stusql[i].course4<<" "<<stusql[i].course5<<" "
+           <<stusql[i].course6<<" "<<stusql[i].course7<<" "<<stusql[i].test0<<'\n';
+    }
+    fs<<"END";
+    opened_file->close();
+    QMessageBox::information(this,"successed","成功更新文件");
+
+}
+
+
+void MainWindow::on_add_ok_clicked()
+{
+    QString nid=ui->idedit->text();
+    nid=nid+ui->numberedit->text();
+    QString nname=ui->nameedit->text();
+    QString nc1=ui->course1dit->text();
+    QString nc2=ui->course2dit->text();
+    QString nc3=ui->course3dit->text();
+    QString nc4=ui->course4dit->text();
+    QString nc5=ui->course5dit->text();
+    QString nc6=ui->course6dit->text();
+    QString nc7=ui->course7dit->text();
+    QString nt=ui->testdit->text();
+
+    stutmp s(nid,nname,nc1,nc2,nc3,nc4,nc5,nc6,nc7,nt);
+
+     QSqlQuery query;
+
+    query.prepare("INSERT INTO stu (id,name,course1,course2,course3,course4,course5,course6,course7,test0,sum ) "
+                  "VALUES (:id, :name,:co1,:co2,:co3,:co4,:co5,:co6,:co7,:tt,:ff)");
+
+     // query.addBindValue(nid);
+     // query.addBindValue(nname);
+     // query.addBindValue(nc1);
+     // query.addBindValue(nc2);
+     // query.addBindValue(nc3);
+     // query.addBindValue(nc4);
+     // query.addBindValue(nc5);
+     // query.addBindValue(nc6);
+     // query.addBindValue(nc7);
+     // query.addBindValue(nt);
+     query.bindValue(":id", nid);
+     query.bindValue(":name", nname);
+     query.bindValue(":co1", nc1);
+     query.bindValue(":co2", nc2);
+     query.bindValue(":co3", nc3);
+     query.bindValue(":co4", nc4);
+     query.bindValue(":co5", nc5);
+     query.bindValue(":co6", nc6);
+     query.bindValue(":co7",nc7);
+     query.bindValue(":tt", nt);
+
+     query.bindValue(":ff",s.final);
+
+
+     if(!query.exec())
+     {
+         qDebug()<<"Error  ADD insert  into data"<<db.lastError();
+     }
+     else qDebug()<<"ADD chenggong";
+     //  sqlInsert.clear();
+
+
+     // query.exec();
+
+     QMessageBox::information(this,tr("信息提示"),tr("信息录入完毕！"));
+
+    m_count++;
+
+     alreadygetstu=false;
+    getallstu();
+
+     on_add_back_clicked();
+
+}
+
+
+void MainWindow::on_add_back_clicked()
+{
+    ui->nameedit->clear();
+    ui->course1dit->clear();
+   ui->course2dit->clear();
+    ui->course3dit->clear();
+    ui->course4dit->clear();
+   ui->course5dit->clear();
+   ui->course6dit->clear();
+    ui->course7dit->clear();
+   ui->testdit->clear();
+
+    ui->widget_main->show();
+    ui->widget_gaojichazhao->close();
+
+    ui->widget_add->close();
+    ui->widget_find1->close();
+    ui->widget_de->close();
+    ui->widget_find2->close();
+    ui->widget_rank->close();
+
+    refresh();
+}
+
+
+void MainWindow::on_analysisbut_clicked()
+{
+    getallstu();
+
+    ui->widget_main->close();
+    ui->widget_gaojichazhao->close();
+
+    ui->widget_add->close();
+    ui->widget_find1->close();
+    ui->widget_de->close();
+    ui->widget_find2->close();
+    ui->widget_rank->close();
+    ui->widget_ana->show();
+
+    ui->searchchoice1->addItem("数理逻辑");
+    ui->searchchoice1->addItem("集合论");
+    ui->searchchoice1->addItem("抽象代数");
+    ui->searchchoice1->addItem("图论");
+    ui->searchchoice1->addItem("平时综合");
+    ui->searchchoice1->addItem("期中测试");
+    ui->searchchoice1->addItem("小论文");
+    ui->searchchoice1->addItem("期末成绩");
+    ui->searchchoice1->addItem("总评成绩");
+    ui->searchchoice1->setCurrentText("总评成绩");
+
+    ui->searchchoice2->addItem("数理逻辑");
+    ui->searchchoice2->addItem("集合论");
+    ui->searchchoice2->addItem("抽象代数");
+    ui->searchchoice2->addItem("图论");
+    ui->searchchoice2->addItem("平时综合");
+    ui->searchchoice2->addItem("期中测试");
+    ui->searchchoice2->addItem("小论文");
+    ui->searchchoice2->addItem("期末成绩");
+    ui->searchchoice2->addItem("总评成绩");
+    ui->searchchoice2->setCurrentText("总评成绩");
+
+    ui->searchchoice3->addItem("数理逻辑");
+    ui->searchchoice3->addItem("集合论");
+    ui->searchchoice3->addItem("抽象代数");
+    ui->searchchoice3->addItem("图论");
+    ui->searchchoice3->addItem("平时综合");
+    ui->searchchoice3->addItem("期中测试");
+    ui->searchchoice3->addItem("小论文");
+    ui->searchchoice3->addItem("期末成绩");
+    ui->searchchoice3->addItem("总评成绩");
+    ui->searchchoice3->setCurrentText("总评成绩");
+
+    getaverage(9);
+
+    QChartView *ChartView;
+    ChartView=new QChartView(createScatterChart());
+    ui->horizontalLayout->insertWidget(0,ChartView);
+}
+
+
+void MainWindow::on_back_3_clicked()
+{
+    ui->widget_main->show();
+    ui->widget_gaojichazhao->close();
+
+    ui->widget_add->close();
+    ui->widget_find1->close();
+    ui->widget_de->close();
+    ui->widget_find2->close();
+    ui->widget_rank->close();
+    ui->widget_ana->close();
+    ui->aveline->clear();
+    ui->sdline->clear();
+    ui->passrateline->clear();
+}
+
+
+void MainWindow::on_pushButton_1_clicked()
+{
+    if(ui->searchchoice1->currentText()=="数理逻辑")getaverage(1);
+    if(ui->searchchoice1->currentText()=="集合论")  getaverage(2);
+    if(ui->searchchoice1->currentText()=="抽象代数")getaverage(3);
+    if(ui->searchchoice1->currentText()=="图论")   getaverage(4);
+    if(ui->searchchoice1->currentText()=="平时综合")getaverage(5);
+    if(ui->searchchoice1->currentText()=="期中测试")getaverage(6);
+    if(ui->searchchoice1->currentText()=="小论文")  getaverage(7);
+    if(ui->searchchoice1->currentText()=="期末成绩")getaverage(8);
+    if(ui->searchchoice1->currentText()=="总评成绩")getaverage(9);
+}
+
+
+void MainWindow::on_pushButton_2_clicked()
+{
+    if(ui->searchchoice2->currentText()=="数理逻辑")getsd(1);
+    if(ui->searchchoice2->currentText()=="集合论")  getsd(2);
+    if(ui->searchchoice2->currentText()=="抽象代数")getsd(3);
+    if(ui->searchchoice2->currentText()=="图论")   getsd(4);
+    if(ui->searchchoice2->currentText()=="平时综合")getsd(5);
+    if(ui->searchchoice2->currentText()=="期中测试")getsd(6);
+    if(ui->searchchoice2->currentText()=="小论文") getsd(7);
+    if(ui->searchchoice2->currentText()=="期末成绩")getsd(8);
+    if(ui->searchchoice2->currentText()=="总评成绩")getsd(9);
+}
+
+
+void MainWindow::on_pushButton_3_clicked()
+{
+    if(ui->searchchoice3->currentText()=="数理逻辑")getpassrate(1);
+    if(ui->searchchoice3->currentText()=="集合论")  getpassrate(2);
+    if(ui->searchchoice3->currentText()=="抽象代数")getpassrate(3);
+    if(ui->searchchoice3->currentText()=="图论")   getpassrate(4);
+    if(ui->searchchoice3->currentText()=="平时综合")getpassrate(5);
+    if(ui->searchchoice3->currentText()=="期中测试")getpassrate(6);
+    if(ui->searchchoice3->currentText()=="小论文") getpassrate(7);
+    if(ui->searchchoice3->currentText()=="期末成绩")getpassrate(8);
+    if(ui->searchchoice3->currentText()=="总评成绩")getpassrate(9);
 }
 

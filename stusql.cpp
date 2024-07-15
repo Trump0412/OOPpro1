@@ -1,7 +1,58 @@
 #include "stusql.h"
 
 stusql::stusql() {}
+stu::stu()
+{
 
+}
+stu::stu(QString id, QString name, QString c1, QString c2, QString c3, QString c4, QString c5, QString c6, QString c7, QString t)
+{
+    s_id=id;
+    s_name=name;
+    course1=c1;
+    course2=c2;
+    course3=c3;
+    course4=c4;
+    course5=c5;
+    course6=c6;
+    course7=c7;
+    test0=t;
+
+    s_course1=getcourse1();
+    s_course2=getcourse2();
+    s_course3=getcourse3();
+    s_course4=getcourse4();
+    s_course5=getcourse5();
+    s_course6=getcourse6();
+    s_course7=getcourse7();
+    test=gettest();
+    final=s_course1+s_course2+s_course3+s_course4+s_course5+s_course6+s_course7+0.5*test;
+}
+
+stu::stu(const stu &c)
+{
+    s_id=c.s_id;
+    s_name=c.s_name;
+    course1=c.course1;
+    course2=c.course2;
+    course3=c.course3;
+    course4=c.course4;
+    course5=c.course5;
+    course6=c.course6;
+    course7=c.course7;
+    test0=c.test0;
+    test=c.test;
+
+    s_course1=c.s_course1;
+    s_course2=c.s_course2;
+    s_course3=c.s_course3;
+    s_course4=c.s_course4;
+    s_course5=c.s_course5;
+    s_course6=c.s_course6;
+    s_course7=c.s_course7;
+
+    final=c.final;
+}
 
 double stu::getcourse1()
 {
@@ -119,5 +170,22 @@ double stu::getfinal()
     return final;
 
 }
-
+bool operator>(const stu&a,const stu&b)
+{
+    if(a.final>b.final)
+        return true;
+    else if(a.final==b.final)
+    {
+        if(a.test>b.test)
+            return true;
+        else if(a.test==b.test)
+        {
+            if(a.s_id>b.s_id)
+                return true;
+            else return false;
+        }
+        else return false;
+    }
+    else return false;
+}
 
