@@ -117,7 +117,9 @@ MainWindow::MainWindow(QWidget *parent)
       ui->widget_gaojichazhao->close();
        ui->widget_rank->close();
       ui->widget_ana->close();
-
+       ui->widget_tw->close();
+       ui->tw->close();
+       ui->widget_change->close();
 
       QChartView *chartview;
       chartview=new QChartView(createbarchart());
@@ -179,6 +181,7 @@ void MainWindow::on_addbut_clicked()
       ui->widget_find1->close();
     ui->widget_add->show();
      ui->widget_de->close();
+    ui->widget_tw->close();
 
     // //获取选中的行
     // int curRow = view->currentIndex().row();
@@ -200,11 +203,25 @@ void MainWindow::on_addbut_clicked()
     //     版权声明：本文为博主原创文章，遵循 CC 4.0 BY-SA 版权协议，转载请附上原文出处链接和本声明。
 
     //             原文链接：https://blog.csdn.net/qq_24127015/article/details/100516198
-     int i=m_count+1;
-     QString addstr="_"+QString::number(i);
 
 
-     ui->numberedit->setText(addstr);
+     if(!change_ok){
+        int i=m_count+1;
+        QString addstr="_"+QString::number(i);
+        ui->numberedit->setText(addstr);
+
+         ui->addchoice->show();
+         ui->addchoice2->show();
+         ui->changechoice->close();
+         ui->changechoice2->close();
+     }
+     else{
+         ui->addchoice->close();
+         ui->addchoice2->close();
+         ui->changechoice->show();
+         ui->changechoice2->show();
+         change_ok=false;
+     }
 }
 
 
@@ -284,6 +301,7 @@ void MainWindow::on_deletebut_clicked()
      ui->widget_find1->close();
 
 #endif
+#if 0
     //1.删除数据库中内容
     QSqlQuery query;
     QString id=ui->lineEdit->text();
@@ -354,6 +372,172 @@ void MainWindow::on_deletebut_clicked()
    delete_ok=false;
     alreadygetstu=false;
    getallstu();
+#endif
+     QString id=ui->lineEdit->text();
+    // QSqlQuery query;
+    if(!id.isEmpty())
+    {
+
+       // QString sqldelete;
+        int ok  =  QMessageBox::warning(this,tr("删除当前学生!"),tr("你确定删除当前学生吗？"), QMessageBox::Yes,QMessageBox::No);
+        //如确认删除
+        if(ok == QMessageBox::Yes)
+        {
+            for(int i=0;i<m_count;i++)
+            {
+                if(stusql[i].s_id==id)
+                {
+                    for(int j=i;j<m_count;j++)
+                    {
+                        stusql[j]=stusql[j+1];
+                    }
+                    m_count--;
+                    break;
+                }
+            }
+
+                   // sqldelete =QString("delete from stu where id=%1").arg(id);
+            QMessageBox::information(this,"successed","成功删除学生信息");
+            QSqlQuery query;//将stusql写入数据库
+
+            query.exec("delete from stu");//删除表内内容
+            for(int i=0;i<m_count;i++)
+            {
+
+                query.prepare("INSERT INTO stu (id,name,course1,course2,course3,course4,course5,course6,course7,test0,sum) VALUES (:id, :name,:co1,:co2,:co3,:co4,:co5,:co6,:co7,:tt,:ff)");
+                query.bindValue(":id", stusql[i].s_id);
+                query.bindValue(":name", stusql[i].s_name);
+                query.bindValue(":co1", stusql[i].course1);
+                query.bindValue(":co2", stusql[i].course2);
+                query.bindValue(":co3", stusql[i].course3);
+                query.bindValue(":co4", stusql[i].course4);
+                query.bindValue(":co5", stusql[i].course5);
+                query.bindValue(":co6", stusql[i].course6);
+                query.bindValue(":co7", stusql[i].course7);
+                query.bindValue(":tt", stusql[i].test0);
+
+                query.bindValue(":ff", stusql[i].final);
+
+
+                if(!query.exec())
+                {
+                    qDebug()<<"Error insert  into data"<<db.lastError();
+                }
+                else qDebug()<<"chenggong";
+                //  sqlInsert.clear();
+            }
+
+        }
+        else
+            QMessageBox::information(this, "提示", "请选择你要删除的学生");
+        // if(!query.exec(sqldelete))
+        // {
+        //     qDebug()<<"Error delete  data"<<db.lastError();
+        // }
+        // if(query.exec(sqldelete) == false){
+
+        //     QMessageBox::critical(this,"error","删除学生信息失败");
+
+        // }
+
+        // else{
+
+        //     QMessageBox::information(this,"successed","成功删除学生信息");
+
+
+
+        // }
+        ui->lineEdit->clear();
+        ui->widget_find1->close();
+        ui->widget_de->close();
+        ui->widget_tw->close();
+        ui->widget_main->show();
+         refresh();
+    }
+    else
+    {
+        int p=ui->tw->currentRow();
+
+        if(p >=0)//若选中一行
+        {
+            QMessageBox::StandardButton res=QMessageBox::question(NULL,"提示","确认删除该学生？该操作不可更改！");
+            if(res==QMessageBox::No)
+                return;
+           // QString s=ui->tw->item(i,1)->text();
+            QString did=ui->tw->item(p,0)->text();
+            ui->tw->removeRow(p);
+
+            for(int i=0;i<m_count;i++)
+            {
+                if(stusql[i].s_id==did)
+                {
+                    for(int j=i;j<m_count;j++)
+                    {
+                        stusql[j]=stusql[j+1];
+                    }
+                    m_count--;
+                    break;
+                }
+            }
+
+            // sqldelete =QString("delete from stu where id=%1").arg(id);
+            QMessageBox::information(this,"successed","成功删除学生信息");
+            QSqlQuery query;//将stusql写入数据库
+
+            query.exec("delete from stu");//删除表内内容
+            for(int i=0;i<m_count;i++)
+            {
+
+                query.prepare("INSERT INTO stu (id,name,course1,course2,course3,course4,course5,course6,course7,test0,sum) VALUES (:id, :name,:co1,:co2,:co3,:co4,:co5,:co6,:co7,:tt,:ff)");
+                query.bindValue(":id", stusql[i].s_id);
+                query.bindValue(":name", stusql[i].s_name);
+                query.bindValue(":co1", stusql[i].course1);
+                query.bindValue(":co2", stusql[i].course2);
+                query.bindValue(":co3", stusql[i].course3);
+                query.bindValue(":co4", stusql[i].course4);
+                query.bindValue(":co5", stusql[i].course5);
+                query.bindValue(":co6", stusql[i].course6);
+                query.bindValue(":co7", stusql[i].course7);
+                query.bindValue(":tt", stusql[i].test0);
+
+                query.bindValue(":ff", stusql[i].final);
+
+
+                if(!query.exec())
+                {
+                    qDebug()<<"Error insert  into data"<<db.lastError();
+                }
+                else qDebug()<<"chenggong";
+                //  sqlInsert.clear();
+            }
+
+
+               //  QString  sqldelete2 =QString("delete from stu where id=%1").arg(did);
+               // // query.exec(sqldelete2);
+               //  if(!query.exec(sqldelete2))
+               //  {
+               //      qDebug()<<"Error delete  data"<<db.lastError();
+               //  }
+                // model->setQuery("select * from user");
+                //view->setModel(model);
+                QMessageBox::information(this, "删除成功", "所选信息删除成功");
+               // refresh();
+
+        }
+        else
+            QMessageBox::information(this, "提示", "请选择你要删除的信息行");
+
+        ui->lineEdit_2->clear();
+        ui->widget_find1->close();
+        ui->widget_de->close();
+        ui->widget_tw->close();
+        ui->widget_main->show();
+         refresh();
+    }
+
+    delete_ok=false;
+    alreadygetstu=false;
+    getallstu();
 }
 
 
@@ -385,8 +569,8 @@ void MainWindow::on_pushButton_clicked()//增加学生的确认
 
 void MainWindow::on_find_id_clicked()
 {
-
-
+    ui->widget_tw->show();
+#if 0
     QString id=ui->lineEdit->text();
 
     QString did=QString("select id,name,course1,course2,course3,course4,course5,course6,course7,test0,sum from stu where id=%1").arg(id);
@@ -417,12 +601,50 @@ void MainWindow::on_find_id_clicked()
      ui->widget_gaojichazhao->close();
 
     if(delete_ok)ui->widget_de->show();
+#endif\
+
+    QString id=ui->lineEdit->text();
+     ui->tw->clearContents();
+    ui->tw->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->tw->setSelectionMode(QAbstractItemView::SingleSelection);//只选中行
+    ui->tw->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
+    QStringList header;
+    header<<"学号"<<"姓名"<<"数理逻辑"<<"集合论"<<"抽象代数"<<"图论"<<"平时综合"<<"期中测试"<<"小论文"<<"期末成绩"<<"总分";
+    ui->tw->setColumnCount(header.size());
+    ui->tw->setHorizontalHeaderLabels(header);
+   // ui->tw->setRowCount(m_count);
+    // ui->tw->setSelectionBehavior(QAbstractItemView::SelectRows);
+    // ui->tw->setSelectionMode(QAbstractItemView::SingleSelection);//只选中行
+    // ui->tw->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    // ui->tw->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    for(int i=0;i<m_count;i++)
+    {
+        if(stusql[i].s_id==id)
+        {
+            ui->tw->setItem(0,0,new QTableWidgetItem(stusql[i].s_id));
+            ui->tw->setItem(0,1,new QTableWidgetItem(stusql[i].s_name));
+            ui->tw->setItem(0,2,new QTableWidgetItem(stusql[i].course1));
+            ui->tw->setItem(0,3,new QTableWidgetItem(stusql[i].course2));
+            ui->tw->setItem(0,4,new QTableWidgetItem(stusql[i].course3));
+            ui->tw->setItem(0,5,new QTableWidgetItem(stusql[i].course4));
+            ui->tw->setItem(0,6,new QTableWidgetItem(stusql[i].course5));
+            ui->tw->setItem(0,7,new QTableWidgetItem(stusql[i].course6));
+            ui->tw->setItem(0,8,new QTableWidgetItem(stusql[i].course7));
+            ui->tw->setItem(0,9,new QTableWidgetItem(stusql[i].test0));
+            ui->tw->setItem(0,10,new QTableWidgetItem(QString::number(stusql[i].final)));
+        }
+    }
+
+
+    if(delete_ok)ui->widget_de->show();
 }
 
 
 void MainWindow::on_find_name_clicked()
 {
-
+    ui->widget_tw->show();
+#if 0
 
     QString name=ui->lineEdit_2->text();
 
@@ -458,20 +680,69 @@ void MainWindow::on_find_name_clicked()
      QMessageBox::information(this, "提示", "请选择你要删除的信息行");
 
     if(delete_ok)ui->widget_de->show();
+#endif
+
+      QString name=ui->lineEdit_2->text();
+
+    ui->tw->clearContents();
+    ui->tw->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->tw->setSelectionMode(QAbstractItemView::SingleSelection);//只选中行
+    ui->tw->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
+    QStringList header;
+    header<<"学号"<<"姓名"<<"数理逻辑"<<"集合论"<<"抽象代数"<<"图论"<<"平时综合"<<"期中测试"<<"小论文"<<"期末成绩"<<"总分";
+    ui->tw->setColumnCount(header.size());
+    ui->tw->setHorizontalHeaderLabels(header);
+
+    int pos;
+     int rowcount=0;
+   // man.ifind(name.toLocal8Bit().data());
+
+    for(int i=0;i<m_count;i++)
+    {
+
+        pos=qstr2str(stusql[i].getname()).find(name.toLocal8Bit().data());
+        if(pos!=-1)
+        {
+            ui->tw->setItem(rowcount,0,new QTableWidgetItem(stusql[i].s_id));
+            ui->tw->setItem(rowcount,1,new QTableWidgetItem(stusql[i].s_name));
+            ui->tw->setItem(rowcount,2,new QTableWidgetItem(stusql[i].course1));
+            ui->tw->setItem(rowcount,3,new QTableWidgetItem(stusql[i].course2));
+            ui->tw->setItem(rowcount,4,new QTableWidgetItem(stusql[i].course3));
+            ui->tw->setItem(rowcount,5,new QTableWidgetItem(stusql[i].course4));
+            ui->tw->setItem(rowcount,6,new QTableWidgetItem(stusql[i].course5));
+            ui->tw->setItem(rowcount,7,new QTableWidgetItem(stusql[i].course6));
+            ui->tw->setItem(rowcount,8,new QTableWidgetItem(stusql[i].course7));
+            ui->tw->setItem(rowcount,9,new QTableWidgetItem(stusql[i].test0));
+            ui->tw->setItem(rowcount,10,new QTableWidgetItem(QString::number(stusql[i].final)));
+            rowcount++;
+        }
 
 
+    }
+
+
+
+
+      if(delete_ok)
+      {
+          ui->widget_de->show();
+          QMessageBox::information(this, "提示", "请选择你要删除的信息行");
+
+      }
 }
 
 
 void MainWindow::on_findbut_clicked()
 {
-    ui->widget_main->show();
+    ui->widget_main->close();
     ui->widget_gaojichazhao->close();
     ui->widget_add->close();
     ui->widget_find1->show();
      ui->widget_find2->close();
     ui->widget_de->close();
      delete_ok=true;
+    showtw();
 }
 
 
@@ -485,6 +756,7 @@ ui->widget_gaojichazhao->close();
     ui->widget_find1->close();
     ui->widget_find2->close();
     ui->widget_de->close();
+    ui->widget_tw->close();
     refresh();
     delete_ok=false;
 }
@@ -510,7 +782,7 @@ ui->widget_gaojichazhao->close();
       ui->searchchoice->addItem("总评成绩");
     ui->searchchoice->setCurrentText("总评成绩");
 
-
+      showtw();
 }
 
 
@@ -656,6 +928,7 @@ void MainWindow::on_back_2_clicked()
     ui->widget_find2->close();
     ui->widget_de->close();
     ui->widget_gaojichazhao->close();
+    ui->widget_tw->close();
     refresh();
 }
 
@@ -665,6 +938,7 @@ void MainWindow::on_back_2_clicked()
 void MainWindow::on_searchmul_clicked()
 {
     getallstu();
+    ui->widget_tw->close();
     double min,max;
     min=ui->score_min->text().toDouble();
     max=ui->score_max->text().toDouble();
@@ -844,6 +1118,7 @@ void MainWindow::on_rankbut_clicked()
     ui->widget_de->close();
     ui->widget_find2->close();
     ui->widget_rank->show();
+    ui->widget_tw->close();
 
 
 }
@@ -1243,6 +1518,54 @@ void MainWindow::getpassrate(int n)
     }
 }
 
+void MainWindow::showtw()
+{
+    getallstu();
+    //ui->treeView->close();
+    ui->widget_main->close();
+    ui->widget_tw->show();
+    ui->tw->show();
+    QStringList header;
+    header<<"学号"<<"姓名"<<"数理逻辑"<<"集合论"<<"抽象代数"<<"图论"<<"平时综合"<<"期中测试"<<"小论文"<<"期末成绩"<<"总分";
+    ui->tw->setColumnCount(header.size());
+    ui->tw->setHorizontalHeaderLabels(header);
+    ui->tw->setRowCount(m_count);
+    ui->tw->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->tw->setSelectionMode(QAbstractItemView::SingleSelection);//只选中行
+    ui->tw->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->tw->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
+    for(int i=0;i<m_count;i++)
+    {
+
+
+        ui->tw->setItem(i,0,new QTableWidgetItem(stusql[i].s_id));
+        ui->tw->setItem(i,1,new QTableWidgetItem(stusql[i].s_name));
+        ui->tw->setItem(i,2,new QTableWidgetItem(stusql[i].course1));
+        ui->tw->setItem(i,3,new QTableWidgetItem(stusql[i].course2));
+        ui->tw->setItem(i,4,new QTableWidgetItem(stusql[i].course3));
+        ui->tw->setItem(i,5,new QTableWidgetItem(stusql[i].course4));
+        ui->tw->setItem(i,6,new QTableWidgetItem(stusql[i].course5));
+        ui->tw->setItem(i,7,new QTableWidgetItem(stusql[i].course6));
+        ui->tw->setItem(i,8,new QTableWidgetItem(stusql[i].course7));
+        ui->tw->setItem(i,9,new QTableWidgetItem(stusql[i].test0));
+        ui->tw->setItem(i,10,new QTableWidgetItem(QString::number(stusql[i].final)));
+
+    }
+}
+
+QString MainWindow::str2qstr(const string str)
+{
+    return QString::fromLocal8Bit(str.data());
+}
+
+string MainWindow::qstr2str(const QString qstr)
+{
+    QByteArray cdata = qstr.toLocal8Bit();
+    return string(cdata);
+
+}
+
 QChart *MainWindow::createbarchart() const
 {
     QChart *chart = new QChart();
@@ -1332,11 +1655,6 @@ QChart *MainWindow::createScatterChart() const
     QValueAxis *axisY = qobject_cast<QValueAxis*>(chart->axes(Qt::Vertical).first());
     Q_ASSERT(axisY);
     axisY->setLabelFormat("%.1f ");
-
-    QValueAxis *axisX = qobject_cast<QValueAxis*>(chart->axes(Qt::Horizontal).first());
-
-    axisY->setLabelFormat("%d ");
- Q_ASSERT(axisX);
 
 
     chart->setTheme(QChart::ChartThemeLight);
@@ -1493,6 +1811,7 @@ void MainWindow::on_add_back_clicked()
     ui->widget_de->close();
     ui->widget_find2->close();
     ui->widget_rank->close();
+    ui->widget_change->close();
 
     refresh();
 }
@@ -1511,6 +1830,7 @@ void MainWindow::on_analysisbut_clicked()
     ui->widget_find2->close();
     ui->widget_rank->close();
     ui->widget_ana->show();
+    ui->widget_tw->close();
 
     ui->searchchoice1->addItem("数理逻辑");
     ui->searchchoice1->addItem("集合论");
@@ -1545,11 +1865,20 @@ void MainWindow::on_analysisbut_clicked()
     ui->searchchoice3->addItem("总评成绩");
     ui->searchchoice3->setCurrentText("总评成绩");
 
-    getaverage(9);
+    double sum;
+    for(int i=0;i<m_count;i++)
+    {
+        sum+=stusql[i].final;
+    }
+    m_ave=sum/m_count;
 
+    if(onlychart)
+    {
     QChartView *ChartView;
     ChartView=new QChartView(createScatterChart());
     ui->horizontalLayout->insertWidget(0,ChartView);
+    onlychart=false;
+    }
 }
 
 
@@ -1609,5 +1938,155 @@ void MainWindow::on_pushButton_3_clicked()
     if(ui->searchchoice3->currentText()=="小论文") getpassrate(7);
     if(ui->searchchoice3->currentText()=="期末成绩")getpassrate(8);
     if(ui->searchchoice3->currentText()=="总评成绩")getpassrate(9);
+}
+
+
+void MainWindow::on_changebut_clicked()
+{
+    ui->widget_main->close();
+    ui->widget_gaojichazhao->close();
+    ui->widget_add->close();
+    ui->widget_find1->show();
+    ui->widget_find2->close();
+    ui->widget_de->close();
+    change_ok=true;
+    showtw();
+    ui->widget_change->show();
+
+    QMessageBox::information(this, "提示", "请选中你要修改的信息行后点击修改按钮");
+
+}
+
+
+void MainWindow::on_lastback_clicked()
+{
+    ui->widget_main->show();
+    ui->widget_gaojichazhao->close();
+
+    ui->widget_add->close();
+    ui->widget_find1->close();
+    ui->widget_de->close();
+    ui->widget_find2->close();
+    ui->widget_rank->close();
+    ui->widget_ana->close();
+
+    ui->widget_change->close();
+    change_ok=false;
+
+    ui->lineEdit->clear();
+    ui->lineEdit_2->clear();
+}
+
+
+void MainWindow::on_changeopen_clicked()
+{
+   int   changepos=ui->tw->currentRow();
+    QString cid=ui->tw->item(changepos,0)->text();
+   if(changepos>=0)
+    {
+
+
+    for(int i=0;i<m_count;i++)
+    {
+        if(stusql[i].s_id==cid)
+       {
+           changenum=i;
+            break;
+        }
+    }
+    ui->IDshow->setText(stusql[changenum].s_id);
+    ui->nameedit->setText(stusql[changenum].s_name);
+    ui->course1dit->setText(stusql[changenum].course1);
+    ui->course2dit->setText(stusql[changenum].course2);
+    ui->course3dit->setText(stusql[changenum].course3);
+    ui->course4dit->setText(stusql[changenum].course4);
+    ui->course5dit->setText(stusql[changenum].course5);
+    ui->course6dit->setText(stusql[changenum].course6);
+    ui->course7dit->setText(stusql[changenum].course7);
+    ui->testdit->setText(stusql[changenum].test0);
+
+    on_addbut_clicked();
+   }
+   else
+        QMessageBox::information(this, "提示", "请选择你要删除的信息行");
+
+   ui->widget_change->close();
+
+   ui->lineEdit->clear();
+   ui->lineEdit_2->clear();
+}
+
+
+void MainWindow::on_change_ok_clicked()
+{
+
+
+    QString nname=ui->nameedit->text();
+    QString nc1=ui->course1dit->text();
+    QString nc2=ui->course2dit->text();
+    QString nc3=ui->course3dit->text();
+    QString nc4=ui->course4dit->text();
+    QString nc5=ui->course5dit->text();
+    QString nc6=ui->course6dit->text();
+    QString nc7=ui->course7dit->text();
+    QString nt=ui->testdit->text();
+
+    stusql[changenum].s_name=nname;
+    stusql[changenum].course1=nc1;
+    stusql[changenum].course2=nc2;
+    stusql[changenum].course3=nc3;
+    stusql[changenum].course4=nc4;
+    stusql[changenum].course5=nc5;
+    stusql[changenum].course6=nc6;
+    stusql[changenum].course7=nc7;
+    stusql[changenum].test0=nt;
+    stusql[changenum].final=stusql[changenum].getfinal();
+
+
+    QSqlQuery query;
+
+    // QString cmd=QString("update stu set name=%1,course1=%2,course2=%3,course3=%4,course4=%5,course5=%6,course6=%7,course7=%8,test0=%9,sum=%10 where id=%11")
+    //                   .arg(nname).arg(nc1).arg(nc2).arg(nc3).arg(nc4).arg(nc5).arg(nc6).arg(nc7).arg(nt).arg(stusql[changenum].final).arg(stusql[changenum].s_id);
+
+    query.exec("delete from stu");//删除表内内容
+    for(int i=0;i<m_count;i++)
+    {
+
+        query.prepare("INSERT INTO stu (id,name,course1,course2,course3,course4,course5,course6,course7,test0,sum) VALUES (:id, :name,:co1,:co2,:co3,:co4,:co5,:co6,:co7,:tt,:ff)");
+        query.bindValue(":id", stusql[i].s_id);
+        query.bindValue(":name", stusql[i].s_name);
+        query.bindValue(":co1", stusql[i].course1);
+        query.bindValue(":co2", stusql[i].course2);
+        query.bindValue(":co3", stusql[i].course3);
+        query.bindValue(":co4", stusql[i].course4);
+        query.bindValue(":co5", stusql[i].course5);
+        query.bindValue(":co6", stusql[i].course6);
+        query.bindValue(":co7", stusql[i].course7);
+        query.bindValue(":tt", stusql[i].test0);
+
+        query.bindValue(":ff", stusql[i].final);
+
+
+        if(!query.exec())
+        {
+            qDebug()<<"Error updateinsert  into data"<<db.lastError();
+        }
+        else qDebug()<<"update chenggong";
+    }
+
+
+    //  sqlInsert.clear();
+
+
+    // query.exec();
+
+    QMessageBox::information(this,tr("信息提示"),tr("信息修改完毕！"));
+
+    refresh();
+
+    alreadygetstu=false;
+    getallstu();
+
+    on_add_back_clicked();
 }
 

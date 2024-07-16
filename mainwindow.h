@@ -17,6 +17,7 @@
 //#include"ui_rank.h"
 //#include"ui_statistic.h"
 
+#include<string.h>
 using namespace std;
 class  sqlqueryModel;
 QT_BEGIN_NAMESPACE
@@ -51,6 +52,12 @@ public:
     void getsd(int n);
 
     void getpassrate(int n);
+
+    void showtw();
+
+    QString str2qstr(const string str);
+
+    string qstr2str(const QString qstr);
 
     QChart* createbarchart() const;
 
@@ -106,6 +113,14 @@ private slots:
 
     void on_pushButton_3_clicked();
 
+    void on_changebut_clicked();
+
+    void on_lastback_clicked();
+
+    void on_changeopen_clicked();
+
+    void on_change_ok_clicked();
+
 private:
     int m_count=0;
     stutmp student[100];
@@ -119,6 +134,9 @@ private:
     QTableView*view;
     bool delete_ok=false;
     bool alreadygetstu=false;
+    bool onlychart=true;
     QString File_Path;
+    bool change_ok=false;
+    int changenum;
 };
 #endif // MAINWINDOW_H

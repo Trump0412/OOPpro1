@@ -170,6 +170,11 @@ double stu::getfinal()
     return final;
 
 }
+
+QString stu::getname()
+{
+    return s_name;
+}
 bool operator>(const stu&a,const stu&b)
 {
     if(a.final>b.final)

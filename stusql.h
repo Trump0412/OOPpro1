@@ -54,6 +54,7 @@ public:
     double getcourse7();
     double gettest();
     double getfinal();
+    QString getname();
 
 
     stu();
