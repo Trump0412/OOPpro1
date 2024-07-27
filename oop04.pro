@@ -45,4 +45,5 @@ DISTFILES += \
     19DE1 .txt \
     rank0.txt \
     readme.txt \
+    readme0.txt \
     stu.txt
